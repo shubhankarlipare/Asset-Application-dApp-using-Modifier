@@ -1,0 +1,162 @@
+<html>
+<head>
+	<title>Asset Application</title>
+
+<style>
+h1 {text-align: center;}
+h2 {text-align: center;}
+h3 {text-align: center;}
+p {text-align: center;}
+div {text-align: center;}
+</style>
+
+</head>
+<body>
+
+<h1><center>Asset Application Modifier Example</h1>
+
+<div><center>
+	<h3>Change Price</h3> <input id="inputPrice" type="text">
+	<button type="button" onClick="SubmitPrice()">Set New Price</button>
+</center></div>
+
+<div><center>
+	<h3>Change Owner</h3> <input id="inputOwner" type="text">
+	<button type="button" onClick="ChangeOwner()">Submit Adrress</button>
+
+	<br><br><br>
+
+	<button type="button" onClick="getOwner()">Get Owner Address</button>
+	<h2 id= "owneradd"> Owner Address </h2>
+
+	<br><br>
+
+	<button type="button" onClick="getPrice()">Get Current Price</button>
+</center></div>
+
+<h2 id= "price"> Current Price </h2>
+
+<!-- <script src="./node_modules/web3/dist/web3.min.js"></script> --> 
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+<script>
+	
+	var ContractAddress = "0x2c2dF437a5db63668091f6B7943e48627619A160";
+	var ContractAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_newOwner",
+				"type": "address"
+			}
+		],
+		"name": "changeOwner",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			}
+		],
+		"name": "setPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getOwner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+		
+
+var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+
+
+
+var contract = new web3.eth.Contract(ContractAbi, ContractAddress);
+
+var CurrentOwner;
+
+function SubmitPrice(){
+
+	var Price = document.getElementById("inputPrice").value;
+	web3.eth.getAccounts().then(
+		function(accounts){
+			contract.methods.setPrice(Price).send({from:CurrentOwner});
+		}
+		);
+
+}
+
+function ChangeOwner(){
+
+	var Owner = document.getElementById("inputOwner").value;
+	web3.eth.getAccounts().then(
+		function(accounts){
+			contract.methods.changeOwner(Owner).send({from:CurrentOwner});
+		}
+		);
+
+}
+
+function getOwner(){
+	
+	contract.methods.getOwner().call(
+		function(error, result){
+		document.getElementById("owneradd").innerHTML = result;
+		CurrentOwner = result;
+		}
+		);
+}
+
+function getPrice(){
+	
+	contract.methods.getPrice().call(
+		function(error, result){
+		document.getElementById("price").innerHTML = result;
+		//CurrentOwner = result;
+		}
+		);
+}
+
+
+
+
+
+</script>
+	
+
+
+</body>
+</html>
